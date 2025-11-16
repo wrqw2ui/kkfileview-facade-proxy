@@ -4,6 +4,8 @@
 本项目作为一个独立的门面服务，通过 HTTP 请求与后端的 kkFileView 实例进行交互。它本身并未修改或包含任何 kkFileView 的源代码。
 核心依赖：kkFileView - 一个功能强大的开源文件在线预览解决方案。
 
+<img width="2170" height="591" alt="image" src="https://github.com/user-attachments/assets/24bec41f-35aa-4947-8eac-b8c7a955deb4" />
+
 ## 支持的功能：
 ### 可视化预览 / Visual Preview 
 对Office文件创建更简洁的html界面，对其他类型透传kkfileview原版界面
