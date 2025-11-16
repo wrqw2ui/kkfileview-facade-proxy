@@ -76,13 +76,14 @@ GET /api/thumbnail?url=<FILE_URL>
 
 ### 步骤 1: 前提条件 - 准备 kkFileView
 您需要一个正在运行的 kkFileView 实例。选择以下任一方式：
-A. (推荐) 本地部署 kkFileView
+* A. (推荐) 本地部署 kkFileView
 使用 Docker 可以一键启动一个本地实例，稳定可靠。
 ```
 docker run -it -p 8012:8012 keking/kkfileview
 ```
 启动后，您的 kkFileView 服务地址为 http://localhost:8012。
-B. (仅供测试) 使用官方 Demo 站
+
+* B. (仅供测试) 使用官方 Demo 站
 您可以直接使用官方提供的 Demo 服务进行快速测试。
 地址: https://file.kkview.cn/
 注意: 公共服务可能不稳定，建议仅用于临时测试。
