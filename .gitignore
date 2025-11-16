@@ -1,0 +1,12 @@
+# 依赖包文件夹
+node_modules
+
+# 环境变量文件
+.env
+
+# 其他系统或IDE生成的文件
+.DS_Store
+npm-debug.log
+yarn-error.log
+.vscode/
+.idea/

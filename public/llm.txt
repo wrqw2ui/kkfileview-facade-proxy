@@ -1,0 +1,110 @@
+# API Reference: kkFileView Facade Service
+# This document defines the functions provided by this service, intended for consumption by developers and AI agents.
+
+## 1. Service Overview
+This service provides a stable, simplified set of functions for processing online documents. It acts as a facade for a more complex file preview system (`kkFileView`). The primary purpose is to convert various document formats into web-friendly outputs like HTML, JSON, or images.
+
+## 2. Core Concepts
+- **`file_url`**: A required parameter for all functions. It MUST be a publicly accessible, URL-encoded link to the source document you want to process.
+- **Supported File Types**: The service is optimized for Microsoft Office documents (`.doc`, `.docx`, `.xls`, `.xlsx`, `.ppt`, `.pptx`), PDF (`.pdf`), and common image formats (`.jpg`, `.png`, etc.). Other formats may work via a fallback mechanism.
+
+---
+
+## 3. Available Functions
+
+### Function 1: get_visual_preview
+- **Description**: Renders a given document file into a self-contained, viewable HTML page. This is ideal for embedding in an `<iframe>` or displaying directly to a user.
+- **HTTP Endpoint**: `GET /api/preview`
+- **Parameters**:
+  - `url` (string, required): The URL of the document file to preview.
+- **Returns**:
+  - **On Success (HTTP 200)**:
+    - `Content-Type`: `text/html`
+    - **Body**: A full HTML document.
+      - For Word/PDF/PPT, the body will contain `<img>` tags for each page.
+      - For Excel, the body will contain an `<iframe>` pointing to the rendered HTML version of the spreadsheet.
+      - For other files, it will contain the proxied and resource-corrected HTML from the underlying preview system.
+  - **On Failure (HTTP 400/500)**:
+    - `Content-Type`: `application/json`
+    - **Body**: A JSON object describing the error. Example: `{"error": "Missing 'url' query parameter"}`
+
+---
+
+### Function 2: extract_structured_content
+- **Description**: Parses a document and extracts its core content into a structured JSON format. This is the primary function for programmatic access to document content.
+- **HTTP Endpoint**: `GET /api/extract`
+- **Parameters**:
+  - `url` (string, required): The URL of the document file to extract.
+- **Returns**:
+  - `Content-Type`: `application/json`
+  - **Response Structures**:
+    - **Success (for Word, PDF, PPT)**:
+      ```json
+      {
+        "status": "success",
+        "type": "images",
+        "pages": [
+          "http://<server>/path/to/page1.jpg",
+          "http://<server>/path/to/page2.jpg",
+          ...
+        ]
+      }
+      ```
+    - **Success (for Excel)**:
+      ```json
+      {
+        "status": "success",
+        "type": "html",
+        "content": "<!DOCTYPE html><html>...</html>"
+      }
+      ```
+    - **Error (File type not supported for JSON extraction)**:
+      ```json
+      {
+        "status": "error",
+        "message": "File type (.txt) is not supported for JSON extraction.",
+        "preview_url": "http://<server>/api/preview?url=..."
+      }
+      ```
+      *Note: The `preview_url` provides a fallback link to the visual preview function.*
+
+---
+
+### Function 3: generate_thumbnail
+- **Description**: Creates a standardized thumbnail image (PNG format) for a given document file.
+- **HTTP Endpoint**: `GET /api/thumbnail`
+- **Parameters**:
+  - `url` (string, required): The URL of the document file for which to generate a thumbnail.
+- **Returns**:
+  - **On Success (HTTP 200)**:
+    - `Content-Type`: `image/png`
+    - **Body**: The binary data of the PNG image.
+  - **On Failure (HTTP 500)**:
+    - **Body**: The response body will be empty.
+  - **On Parameter Error (HTTP 400)**:
+    - `Content-Type`: `application/json`
+    - **Body**: A JSON object describing the error.
+
+---
+
+## 4. Usage Examples (using curl)
+
+Let's assume the service is running at `http://localhost:3800` and the file URL is `https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf`.
+
+**Example 1: Get Visual Preview**
+```bash
+# This will print the full HTML to the console.
+curl "http://localhost:3800/api/preview?url=https%3A%2F%2Fwww.w3.org%2FWAI%2FER%2Ftests%2Fxhtml%2Ftestfiles%2Fresources%2Fpdf%2Fdummy.pdf"
+```
+
+**Example 2: Extract Structured Content**
+```bash
+# This will return a JSON object with a list of image URLs for each page of the PDF.
+curl "http://localhost:3800/api/extract?url=https%3A%2F%2Fwww.w3.org%2FWAI%2FER%2Ftests%2Fxhtml%2Ftestfiles%2Fresources%2Fpdf%2Fdummy.pdf"
+```
+
+**Example 3: Generate a Thumbnail**
+```bash
+# This will download the thumbnail and save it as 'thumbnail.png'.
+curl -o thumbnail.png "http://localhost:3800/api/thumbnail?url=https%3A%2F%2Fwww.w3.org%2FWAI%2FER%2Ftests%2Fxhtml%2Ftestfiles%2Fresources%2Fpdf%2Fdummy.pdf"
+```
